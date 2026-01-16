@@ -44,7 +44,7 @@ sometimes make changes to this file, and you will have to run `robotpy sync` aga
 # Check Installation
 
 - Open a terminal using the `Start Command Prompt.bat` batch file.
-- Run `robotpy --main src/hello_robot/hello_robot.py sim`
+- Run `robotpy --main src\hello_robot\hello_robot.py sim`
 
 You should see the simulation window:
 

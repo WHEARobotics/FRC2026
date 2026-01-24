@@ -8,7 +8,7 @@
 This ensures you have everyone else's changes. If there is a "merge conflict" error, see "Resolving merge conflicts" below.
 * If there were changes to `pyproject.toml`, execute `robotpy sync` to get
   the latest wpilib, robotpy, etc. code, both for your computer and ready
-  for when you deploy to a robot.
+  for when you deploy to a robot. See the "Maintaining" section of [Installation.md](Installation.md).
 * Edit and test your code.
 * When you have something working, even an intermediate step, make
   a commit.

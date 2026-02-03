@@ -26,7 +26,7 @@ class Myrobot(wpilib.TimedRobot):
 
         # ----------------------------------------------------------------------
         # Human interface
-        self.xbox = wpilib.XboxController(1)
+        self.xbox = wpilib.XboxController(0)
 
         # ----------------------------------------------------------------------
         # Motor controllers
@@ -36,7 +36,7 @@ class Myrobot(wpilib.TimedRobot):
         # self.motor4 = rev.CANSparkMax(4, rev.CANSparkMax.MotorType.kBrushless)
 
         # Test a Kraken
-        self.kraken = phoenix6.hardware.TalonFX(1)
+        self.kraken = phoenix6.hardware.TalonFX(0)
 
         # Note that "set_position" does not _command_ a position, it tells
         # the Kraken that its encoder should read the given position at

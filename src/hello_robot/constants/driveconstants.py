@@ -23,10 +23,10 @@ class DriveConstants:
 
     # CANcoder (magnet) offsets in rotations that we got from the CANcoder using Phoenix Tuner X 
     # Not really needed
-    BR_OFFSET = 0 # -0.242
-    BL_OFFSET = 0 # -0.175
-    FR_OFFSET = 0 # 0.033
-    FL_OFFSET = 0 # -0.081
+    BR_OFFSET = -0.245361  # -0.242
+    BL_OFFSET = -0.180176 # -0.175
+    FR_OFFSET = 0.031738 # 0.033
+    FL_OFFSET = -0.096680  # -0.081
 
     # Kraken IDs
     DRIVE_FR = 12
@@ -45,9 +45,10 @@ class DriveConstants:
     # Drivetrain geometry, gearing, etc.
     TRACK_HALF_WIDTH: inches = metersToInches(0.27) # meters 
     WHEELBASE_HALF_LENGTH: inches = metersToInches(0.27)
-    TURN_GEAR_RATIO = 468.0/35.0
-    DRIVE_GEAR_RATIO = 6.2
+    TURN_GEAR_RATIO = 468.0/35.0 #10 pinion gear
+    DRIVE_GEAR_RATIO = 6.2 #11 pinion gear
     WHEEL_DIA: inches = 4 # 4" diameter
+
     WHEEL_RADIUS: inches = WHEEL_DIA / 2
 
     FREE_SPEED = 3.76 # max

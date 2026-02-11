@@ -217,7 +217,7 @@ class SwerveModule:
     def _configure_turn_motor() -> TalonFXConfiguration:
         configuration = TalonFXConfiguration()
 
-        configuration.motor_output.inverted = InvertedValue.CLOCKWISE_POSITIVE
+        configuration.motor_output.inverted = InvertedValue.COUNTER_CLOCKWISE_POSITIVE
         configuration.motor_output.neutral_mode = NeutralModeValue.COAST
 
 
@@ -233,7 +233,7 @@ class SwerveModule:
     def _configure_drive_motor() -> TalonFXConfiguration:
         configuration = TalonFXConfiguration()
 
-        configuration.motor_output.inverted = InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        configuration.motor_output.inverted = InvertedValue.CLOCKWISE_POSITIVE
         configuration.motor_output.neutral_mode = NeutralModeValue.BRAKE
 
         return configuration

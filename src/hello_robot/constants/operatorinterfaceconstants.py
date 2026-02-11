@@ -12,6 +12,7 @@ class OperatorInterfaceConstants:
     BUMPER_LEFT: int = XboxController.Button.kLeftBumper
 
     LEFT_TRIGGER: int = XboxController.Axis.kLeftTrigger
+    RIGHT_TRIGGER: int = XboxController.Axis.kRightTrigger
 
     LEFT_JOYSTICK_PRESSED: int = XboxController.Button.kLeftStick
     RIGHT_JOYSTICK_PRESSED: int = XboxController.Button.kRightStick

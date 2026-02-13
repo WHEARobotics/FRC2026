@@ -20,13 +20,13 @@ class DriveConstants:
     CAN_FL = 8
     CAN_BL = 5
     CAN_BR = 2
-
+    # Gears to the LEFT fo the Robot
     # CANcoder (magnet) offsets in rotations that we got from the CANcoder using Phoenix Tuner X 
     # Not really needed
-    BR_OFFSET = -0.245361  # -0.242
-    BL_OFFSET = -0.180176 # -0.175
-    FR_OFFSET = 0.031738 # 0.033
-    FL_OFFSET = -0.096680  # -0.081
+    BR_OFFSET = -0.253906  # -0.242
+    BL_OFFSET = -0.319580 # -0.175
+    FR_OFFSET = 0.464844 # 0.033
+    FL_OFFSET = -0.414307  # -0.081
 
     # Kraken IDs
     DRIVE_FR = 12

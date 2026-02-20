@@ -9,12 +9,12 @@ from wpilib import SmartDashboard, SendableChooser
 from constants.operatorinterfaceconstants import OperatorInterfaceConstants
 
 from subsystems.drive_subsystem import DriveSubsystem # doublecheck 
-# from subsystems.shooter_subsystem import ShooterSubsystem
+from subsystems.shooter_subsystem import ShooterSubsystem
 
 
 from commands.drive_with_joystick_command import DriveWithJoystickCommand
-# from commands.shooter_idle_command import ShooterIdleCommand
-# from commands.shoot_command import ShootCommand
+from commands.shooter_idle_command import ShooterIdleCommand
+from commands.shoot_command import ShootCommand
 from commands.reset_gyro_command import ResetGyroCommand # doublecheck
 from commands.slow_mode_off_command import SlowModeOffCommand #doublecheck
 from commands.slow_mode_on_command import SlowModeOnCommand # doublecheck
@@ -25,7 +25,7 @@ class RobotContainer:
     def __init__(self):
 
         self.drive_subsystem = DriveSubsystem()
-        # self.shooter_subsystem = ShooterSubsystem()
+        self.shooter_subsystem = ShooterSubsystem()
 
         self.dr_controller = self._initialize_dr_controller()
         self.op_controller = self._initialize_op_controller()
@@ -40,9 +40,9 @@ class RobotContainer:
         self.drive_subsystem.setDefaultCommand(
             teleop_command
         )
-        # self.shooter_subsystem.setDefaultCommand(
-        #     ShooterIdleCommand(self.shooter_subsystem)
-        # )
+        self.shooter_subsystem.setDefaultCommand(
+            ShooterIdleCommand(self.shooter_subsystem)
+        )
 
     def get_drive_value_from_joystick(self) -> tuple[float, float, float]:
         """  
@@ -97,9 +97,9 @@ class RobotContainer:
         controller = CommandXboxController(
             OperatorInterfaceConstants.OPERATOR_CONTROLLER_PORT
         )
-        # controller.rightTrigger().whileTrue(
-        #     ShootCommand(shoot = self.shooter_subsystem)
-        # )
+        controller.rightTrigger().whileTrue(
+            ShootCommand(shoot = self.shooter_subsystem)
+        )
 
 
         return controller

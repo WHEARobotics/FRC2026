@@ -5,6 +5,8 @@ from wpimath.units import seconds
 import rev
 
 
+
+
 class Myrobot(wpilib.TimedRobot):
     """Simple robot to drive motors for testing.
     Initially written for MAKO, but could easily be changed.
@@ -32,11 +34,25 @@ class Myrobot(wpilib.TimedRobot):
         # Motor controllers
 
         # MAKO's left-side motor controllers, SparkMaxes
-        # self.motor2 = rev.SparkMax(33, rev.SparkMax.MotorType.kBrushless)
-        # self.motor4 = rev.CANSparkMax(4, rev.CANSparkMax.MotorType.kBrushless)
+        self.motor2 = rev.SparkMax(5, rev.SparkMax.MotorType.kBrushless)
+        # self.motor4 = rev.CANSparkMax(6, rev.CANSparkMax.MotorType.kBrushless)
 
         self.motor5 = rev.SparkFlex(4, rev.SparkFlex.MotorType.kBrushless)
- 
+        self.motor5Encoder = self.motor5.getEncoder()
+        self.motor5ClosedLoop = rev.ClosedLoopConfig()
+        self.motor5ClosedLoop.D(0.0)
+        self.motor5ClosedLoop.I(0.0)
+        self.motor5ClosedLoop.P(0.01)
+
+        self.motor5Config = rev.SparkFlexConfig()
+        
+        self.motor5Config.apply(self.motor5ClosedLoop)
+
+        self.motor5.configure(self.motor5Config, rev.ResetMode.kResetSafeParameters, rev.PersistMode.kNoPersistParameters)
+
+        self.motor5ClosedLoopController = self.motor5.getClosedLoopController()
+
+
 
         # Test a Kraken
         #self.kraken = phoenix6.hardware.TalonFX(0)
@@ -147,21 +163,34 @@ class Myrobot(wpilib.TimedRobot):
         a = self.xbox.getAButton()
         b = self.xbox.getBButton()
         
+        print(self.motor5Encoder.getVelocity())
+        
 
         # Command motor operation.
         # self.motor2.set(left)
         # self.motor4.set(right)
-
-        if left > 0.2 or left < -0.2:
-            print(left)
-            self.motor5.set(left / 10)
-        elif a:
-            self.motor5.set(0.1)
+       
+        if a:
+            self.motor5.set(0.6)
+            # self.motor5ClosedLoopController.setSetpoint(40, rev.SparkLowLevel.ControlType.kVelocity)
         elif b:
-            self.motor5.set(-0.1)
+            self.motor5.set(-0.6)
+            # self.motor5ClosedLoopController.setSetpoint(-40, rev.SparkLowLevel.ControlType.kVelocity)
         else:
-            self.motor5.set(0.0)
+            self.motor5.stopMotor()
 
+        if self.motor5Encoder.getVelocity() > -670 and self.motor5Encoder.getVelocity() < -660:   #-4610, -4590
+            self.motor2.set(0.1)
+        else:
+            self.motor2.stopMotor()
+
+
+        
+        
+
+
+
+        
 
         # # Kraken, either brake or move to a position
         # desired_rotations = right * 5
@@ -179,11 +208,13 @@ class Myrobot(wpilib.TimedRobot):
         # else:
         #     # self.kraken.set_control(self.brake_request)
 
-        # if self.print_timer.advanceIfElapsed(0.2):
-            # wpilib.SmartDashboard.putString(
-            #     "DB/String 0",
-            #     "rotations: {:5.1f}".format(self.kraken.get_position().value),
-            # )
+        if self.print_timer.advanceIfElapsed(0.5):
+        #     # wpilib.SmartDashboard.putString(
+        #         "DB/String 0",
+        #         "rotations: {:5.1f}".format(self.motor5Encoder.getVelocity()),
+        #     )
+            print(self.motor5Encoder.getVelocity())
+
 
         # Code to test SparkMax if we have one.
         

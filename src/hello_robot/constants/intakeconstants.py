@@ -1,8 +1,8 @@
-# from dataclasses import dataclass
+from dataclasses import dataclass
 
-# @dataclass(frozen=True)
-# class IntakeConstants:
-#     """ It's for the intake """
+@dataclass(frozen=True)
+class IntakeConstants:
+    """ It's for the intake """
 
-#     MOTOR_ID = 13
+    MOTOR_ID = 13
 

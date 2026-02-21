@@ -15,14 +15,16 @@ class ShootCommand(commands2.Command):
         self.addRequirements(shoot)
 
     def execute(self):
-        self.shoot.shooter_action(0.7)
+        
+        self.shoot.shooter_action(-0.6)
+        self.shoot.check_shooter_velocity()
         if self.shoot.check_shooter_velocity() == True:
             self.shoot.kick()
-        else:
+        elif self.shoot.check_shooter_velocity() == False:
             self.shoot.stop_kicking()
 
     """
     Makes sure code is finished
     """
     def isFinished(self) -> bool:
-        return True
+        return False

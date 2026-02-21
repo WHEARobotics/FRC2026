@@ -16,6 +16,7 @@ class ShooterIdleCommand(commands2.Command):
 
     def execute(self):
         self.shoot.shooter_stop() 
+        self.shoot.stop_kicking()
 
     """
     Makes sure code is finished

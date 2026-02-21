@@ -10,6 +10,7 @@ from constants.operatorinterfaceconstants import OperatorInterfaceConstants
 
 from subsystems.drive_subsystem import DriveSubsystem # doublecheck 
 from subsystems.shooter_subsystem import ShooterSubsystem
+from subsystems.intake_subsystem import IntakeSubsystem
 
 
 from commands.drive_with_joystick_command import DriveWithJoystickCommand
@@ -18,6 +19,9 @@ from commands.shoot_command import ShootCommand
 from commands.reset_gyro_command import ResetGyroCommand # doublecheck
 from commands.slow_mode_off_command import SlowModeOffCommand #doublecheck
 from commands.slow_mode_on_command import SlowModeOnCommand # doublecheck
+from commands.intake_command import IntakeCommand
+from commands.intake_idle_command import IntakeIdleCommand
+
 
 
 
@@ -26,6 +30,7 @@ class RobotContainer:
 
         self.drive_subsystem = DriveSubsystem()
         self.shooter_subsystem = ShooterSubsystem()
+        self.intake_subsystem = IntakeSubsystem()
 
         self.dr_controller = self._initialize_dr_controller()
         self.op_controller = self._initialize_op_controller()
@@ -42,6 +47,9 @@ class RobotContainer:
         )
         self.shooter_subsystem.setDefaultCommand(
             ShooterIdleCommand(self.shooter_subsystem)
+        )
+        self.intake_subsystem.setDefaultCommand(
+            IntakeIdleCommand(self.intake_subsystem)
         )
 
     def get_drive_value_from_joystick(self) -> tuple[float, float, float]:
@@ -99,6 +107,9 @@ class RobotContainer:
         )
         controller.rightTrigger().whileTrue(
             ShootCommand(shoot = self.shooter_subsystem)
+        )
+        controller.leftTrigger().whileTrue(
+            IntakeCommand(intake = self.intake_subsystem)
         )
 
 

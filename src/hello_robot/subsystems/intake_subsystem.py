@@ -6,7 +6,7 @@ from constants.intakeconstants import IntakeConstants
 from constants.new_types import inches_per_second, degrees_per_second, percentage
 
 
-class IntakeSubsystem(commands2.subsystem):
+class IntakeSubsystem(commands2.Subsystem):
     def __init__(self):
         super().__init__()
 

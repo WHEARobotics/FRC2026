@@ -5,7 +5,7 @@ import logging
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.units import seconds
 from typing import Optional, Callable, Tuple
-from constants.vision import VisionConstants
+from constants.visionconstant import VisionConstants
 
 logger = logging.getLogger(__name__)
 

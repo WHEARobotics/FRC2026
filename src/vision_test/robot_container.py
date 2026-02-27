@@ -35,18 +35,19 @@ class RobotContainer:
         self.drive_subsystem = DriveSubsystem()
         # self.shooter_subsystem = ShooterSubsystem()
         # self.intake_subsystem = IntakeSubsystem()
+        self.vision_subsystem = VisionSubsystem(
+            add_vision_measurement_fn = self.drive_subsystem.add_vision_measurement
+        # or lambda p, ts, std: self.drivetrain.odometry.addVisionMeasurement(p, ts, std)
+        )
 
         self.dr_controller = self._initialize_dr_controller()
         self.op_controller = self._initialize_op_controller()
 
         self._initialize_default_commands()
 
-        self.vision = VisionSubsystem(
-            add_vision_measurement_fn=self.drivetrain.add_vision_measurement
-        # or lambda p, ts, std: self.drivetrain.odometry.addVisionMeasurement(p, ts, std)
-        )
+        
 
-        wpilib.SmartDashboard.putString("Vision/Status", self.vision.debug_status())
+        wpilib.SmartDashboard.putString("Vision/Status", self.vision_subsystem.debug_status())
 
 
     def _initialize_default_commands(self):
@@ -98,7 +99,7 @@ class RobotContainer:
             OperatorInterfaceConstants.DRIVER_CONTROLLER_PORT
         )
 
-        controller.a().whileTrue(AimAtHubTagCommand(self.vision, self.drivetrain))
+        controller.a().whileTrue(AimAtHubTagCommand(vision = self.vision_subsystem, drivetrain = self.drive_subsystem))
 
         AUTOALIGN_X = 0
         AUTOALIGN_Y = 10

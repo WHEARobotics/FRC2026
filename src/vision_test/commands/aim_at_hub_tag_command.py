@@ -1,7 +1,7 @@
 import commands2
 
 from subsystems.vision_subsystem import VisionSubsystem
-from constants.visionconstants import VisionConstants
+from constants.visionconstant import VisionConstants
 
 # Simple PID-like turn to face a HUB AprilTag (e.g., IDs 2-11)
 class AimAtHubTagCommand(commands2.Command):

@@ -2,6 +2,8 @@ import commands2
 import limelight
 import limelightresults
 import logging
+import wpilib
+from wpilib import Shuffleboard, SmartDashboard
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.units import seconds
 from typing import Optional, Callable, Tuple

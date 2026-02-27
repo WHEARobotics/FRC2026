@@ -32,4 +32,5 @@ requires = ["robotpy-apriltag",
             "robotpy-commands-v2", 
             "phoenix6",
             "robotpy-rev",
+            "limelightlib-python",
 ]

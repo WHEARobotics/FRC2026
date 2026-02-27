@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "robotpy>=2026.2.1",
+    "limelightlib-python",
 ]
 
 
@@ -31,4 +32,5 @@ requires = ["robotpy-apriltag",
             "robotpy-commands-v2", 
             "phoenix6",
             "robotpy-rev",
+            "limelightlib-python",
 ]

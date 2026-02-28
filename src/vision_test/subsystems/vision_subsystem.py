@@ -2,8 +2,8 @@ import commands2
 import limelight
 import limelightresults
 import logging
-import wpilib
-from wpilib import Shuffleboard, SmartDashboard
+from wpilib.shuffleboard import Shuffleboard
+from ntcore import NetworkTableInstance
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.units import seconds
 from typing import Optional, Callable, Tuple
@@ -54,6 +54,13 @@ class VisionSubsystem(commands2.Subsystem):
         self.last_result: Optional[limelightresults.GeneralResult] = None
         self.last_timestamp: Optional[float] = None
 
+        vision_tab = Shuffleboard.getTab("Vision")
+        self.pose_entry = vision_tab.add("Robot Pose (m)", "No pose").getEntry()
+        self.tag_entry = vision_tab.add("AprilTag ID", -1).getEntry()
+
+
+
+
     def periodic(self) -> None:
         if self.limelight is None:
             return
@@ -64,6 +71,8 @@ class VisionSubsystem(commands2.Subsystem):
 
         self.last_result = result
         self.last_timestamp = result.timestamp
+
+        parsed = limelightresults.parse_results(result)
 
         # Basic rejection
         if not self._is_result_trustworthy(result):
@@ -86,6 +95,25 @@ class VisionSubsystem(commands2.Subsystem):
             )
 
             logger.debug(f"Vision pose update: {pose} @ {self.last_timestamp:.3f}s")
+
+            nt = NetworkTableInstance.getDefault()
+            tid = nt.getTable("limelight").getNumber("tid", -1)
+            self.tag_entry.setNumber(tid)
+            print(f"Tag ID: {tid}")
+
+        if self.has_valid_pose():          # or however check
+            robot_pose = self.get_robot_pose()   # returns Pose2d or dict/list
+            # tag_id = self.get_best_tag_id() # int or None
+
+            # Push to Shuffleboard (updates every ~20 ms)
+            self.pose_entry.setString(f"X:{robot_pose.X:.2f} Y:{robot_pose.Y:.2f} Rot:{robot_pose.rotation().degrees():.1f}°")
+            # self.tag_entry.setNumber(tag_id if tag_id is not None else -1)
+
+            # Optional: also push to SmartDashboard if prefer the old dashboard
+            # SmartDashboard.putString("Vision/RobotPose", ...)
+        else:
+            self.pose_entry.setString("No AprilTag")
+            # self.tag_entry.setNumber(-1)
 
     def _is_result_trustworthy(self, result: limelightresults.GeneralResult) -> bool:
         """Apply filters to avoid feeding bad data to odometry."""

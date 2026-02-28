@@ -357,7 +357,7 @@ class DriveSubsystem(commands2.Subsystem):
         # Calculate the "gas pedal" values for each axis.
         present_x = self.pose.X()
         pid_output_x = metersToInches(self.x_controller.calculate(present_x))
-        clamped_x = clamp(
+        clamped_x = self.clamp(
             val = pid_output_x,
             min_val = -DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
             max_val = DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
@@ -365,7 +365,7 @@ class DriveSubsystem(commands2.Subsystem):
 
         present_y = self.pose.Y()
         pid_output_y = metersToInches(self.y_controller.calculate(present_y))
-        clamped_y = clamp(
+        clamped_y = self.clamp(
             val = pid_output_y,
             min_val = -DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
             max_val = DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
@@ -374,7 +374,7 @@ class DriveSubsystem(commands2.Subsystem):
         present_rot = self.pose.rotation().degrees()
         present_rot = wpimath.inputModulus(present_rot, -180, 180)
         pid_output_rot = self.rot_controller.calculate(present_rot)
-        clamped_rot = clamp(
+        clamped_rot = self.clamp(
             val = pid_output_rot,
             min_val = -DriveConstants.MAX_DEGREES_PER_SECOND,
             max_val = DriveConstants.MAX_DEGREES_PER_SECOND,

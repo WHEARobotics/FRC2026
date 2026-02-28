@@ -6,17 +6,6 @@ from commands2 import CommandScheduler
 
 import robot_container 
 
-
-
-
-
-
-
-
-
-
-
-
 class Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
@@ -44,9 +33,6 @@ class Robot(wpilib.TimedRobot):
 
     def disabledPeriodic(self):
         pass
-
-
-
 
 
 

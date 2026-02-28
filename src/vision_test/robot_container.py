@@ -35,10 +35,11 @@ class RobotContainer:
         self.drive_subsystem = DriveSubsystem()
         # self.shooter_subsystem = ShooterSubsystem()
         # self.intake_subsystem = IntakeSubsystem()
-        self.vision_subsystem = VisionSubsystem(
-            add_vision_measurement_fn = self.drive_subsystem.add_vision_measurement
-        # or lambda p, ts, std: self.drivetrain.odometry.addVisionMeasurement(p, ts, std)
-        )
+        # self.vision_subsystem = VisionSubsystem(
+        #     add_vision_measurement_fn = self.drive_subsystem.add_vision_measurement
+        # # or lambda p, ts, std: self.drivetrain.odometry.addVisionMeasurement(p, ts, std)
+        # )
+        self.vision_subsystem = VisionSubsystem(None)
 
         self.dr_controller = self._initialize_dr_controller()
         self.op_controller = self._initialize_op_controller()

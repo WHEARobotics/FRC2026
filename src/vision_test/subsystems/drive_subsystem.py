@@ -24,12 +24,6 @@ from subsystems.swerve_module_subsystem import SwerveModule # swerve_module in o
 
 logger = logging.getLogger(__name__)
 
-
-
-
-
-
-
 class DriveSubsystem(commands2.Subsystem):
     def __init__(self):
         super().__init__()
@@ -94,25 +88,7 @@ class DriveSubsystem(commands2.Subsystem):
             self._initialize_pid_controllers()
         )
 
-        
-
-
-
-
-
-
-
-
         self.pose = self.odometry.getEstimatedPosition()
-
-
-
-
-
-
-
-
-
 
     def drive_by_effort(
         self, drive_effort: percentage, turn_effort: percentage
@@ -125,10 +101,6 @@ class DriveSubsystem(commands2.Subsystem):
         # Probably: (probably??? what???)
         for module in self.modules:
             module.set_turn_angle(desired_angle_degrees)
-
-
-
-
 
     def get_gyro_heading_degrees(self) -> degrees:
         """  
@@ -157,11 +129,6 @@ class DriveSubsystem(commands2.Subsystem):
         ) 
 
 
-
-
-
-
-
     def periodic(self):
         for module in self.modules:
             module.periodic()
@@ -175,10 +142,8 @@ class DriveSubsystem(commands2.Subsystem):
 
         positions = [module.get_position() for module in self.modules]
         self.odometry.update(self.get_gyro_heading_rotation2d(), tuple(positions))
-
-
-
         self.pose = self.odometry.getEstimatedPosition()
+
         SmartDashboard.putNumber("Robot X", metersToInches(self.pose.X()))
         SmartDashboard.putNumber("Robot Y", metersToInches(self.pose.Y()))
         SmartDashboard.putNumber("Gyro Degree", self.get_gyro_heading_degrees())
@@ -190,26 +155,6 @@ class DriveSubsystem(commands2.Subsystem):
         SmartDashboard.putNumber("Back Right Pos", self.BackRightModule.get_position().angle.degrees())
         
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         self.field_sim.setRobotPose(self.pose)
 
     def drive(
@@ -220,9 +165,6 @@ class DriveSubsystem(commands2.Subsystem):
     ) -> None:
         """
     
-        
-
-
 
 
         """
@@ -233,10 +175,6 @@ class DriveSubsystem(commands2.Subsystem):
         )
         for module, state in zip(self.modules, desaturated_module_states):
             module.set_desired_state(state)
-
-
-
-
 
 
     def get_speed_mode(self) -> bool:
@@ -278,10 +216,6 @@ class DriveSubsystem(commands2.Subsystem):
             -self.get_gyro_heading_rotation2d(),
         )
         return cs
-
-
-
-
 
     def _initialize_odometry(
         self, kinematics: SwerveDrive4Kinematics
@@ -357,7 +291,7 @@ class DriveSubsystem(commands2.Subsystem):
         # Calculate the "gas pedal" values for each axis.
         present_x = self.pose.X()
         pid_output_x = metersToInches(self.x_controller.calculate(present_x))
-        clamped_x = clamp(
+        clamped_x = self.clamp(
             val = pid_output_x,
             min_val = -DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
             max_val = DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
@@ -365,7 +299,7 @@ class DriveSubsystem(commands2.Subsystem):
 
         present_y = self.pose.Y()
         pid_output_y = metersToInches(self.y_controller.calculate(present_y))
-        clamped_y = clamp(
+        clamped_y = self.clamp(
             val = pid_output_y,
             min_val = -DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
             max_val = DriveConstants.MAX_SPEED_INCHES_PER_SECOND,
@@ -374,7 +308,7 @@ class DriveSubsystem(commands2.Subsystem):
         present_rot = self.pose.rotation().degrees()
         present_rot = wpimath.inputModulus(present_rot, -180, 180)
         pid_output_rot = self.rot_controller.calculate(present_rot)
-        clamped_rot = clamp(
+        clamped_rot = self.clamp(
             val = pid_output_rot,
             min_val = -DriveConstants.MAX_DEGREES_PER_SECOND,
             max_val = DriveConstants.MAX_DEGREES_PER_SECOND,
@@ -452,10 +386,6 @@ class DriveSubsystem(commands2.Subsystem):
     def stop(self):
         for module in self.modules:
             module.stop()
-
-
-
-
 
 
     def check_and_set_slow_mode(self):

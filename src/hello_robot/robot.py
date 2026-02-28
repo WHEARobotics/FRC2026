@@ -38,7 +38,9 @@ class Robot(wpilib.TimedRobot):
 
 
     def autonomousInit(self):
-        pass
+        self.autonomous_command = self.container.get_auto_command
+        if self.autonomous_command is not None:
+            self.
 
     
 

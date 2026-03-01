@@ -1,11 +1,12 @@
-from cammands2 import Command
+import commands2
+from commands2 import Command
 from wpimath.geometry import Pose2d
 
 from subsystems.drive_subsystem import DriveSubsystem
 
 
 class DriveToGoal (Command):
-    def __init__(self, drive_subsystem, DriveSubsystem, goal_pose: Pose2d):
+    def __init__(self, drive_subsystem: DriveSubsystem, goal_pose: Pose2d):
         super().__init__()
         self.drive_subsystem = drive_subsystem
         self.goal_pose = goal_pose

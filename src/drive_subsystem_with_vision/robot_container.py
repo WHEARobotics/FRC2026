@@ -1,26 +1,21 @@
+import wpilib
 import commands2
 from commands2.button import CommandXboxController
 from wpimath import applyDeadband
 from wpimath.geometry import Pose2d
 
 from wpilib import SmartDashboard, SendableChooser
-
+from wpilib.shuffleboard import Shuffleboard
 
 from constants.operatorinterfaceconstants import OperatorInterfaceConstants
+from constants.driveconstants import DriveConstants
 
-from subsystems.drive_subsystem import DriveSubsystem # doublecheck 
-from subsystems.shooter_subsystem import ShooterSubsystem
-from subsystems.intake_subsystem import IntakeSubsystem
+from subsystems.drive_subsystem import DriveSubsystem
 
-
-from commands.drive_with_joystick_command import DriveWithJoystickCommand
-from commands.shooter_idle_command import ShooterIdleCommand
-from commands.shoot_command import ShootCommand
-from commands.reset_gyro_command import ResetGyroCommand # doublecheck
-from commands.slow_mode_off_command import SlowModeOffCommand #doublecheck
-from commands.slow_mode_on_command import SlowModeOnCommand # doublecheck
-from commands.intake_command import IntakeCommand
-from commands.intake_idle_command import IntakeIdleCommand
+from commands.aim_at_hub_tag_command import AimAtHubTagCommand
+from commands.reset_gyro_command import ResetGyroCommand 
+from commands.slow_mode_off_command import SlowModeOffCommand 
+from commands.slow_mode_on_command import SlowModeOnCommand 
 
 
 
@@ -28,29 +23,10 @@ from commands.intake_idle_command import IntakeIdleCommand
 class RobotContainer:
     def __init__(self):
 
-        self.drive_subsystem = DriveSubsystem()
-        self.shooter_subsystem = ShooterSubsystem()
-        self.intake_subsystem = IntakeSubsystem()
+    
+        self.drive_subsystem = DriveSubsystem(None)
 
         self.dr_controller = self._initialize_dr_controller()
-        self.op_controller = self._initialize_op_controller()
-
-        self._initialize_default_commands()
-
-
-    def _initialize_default_commands(self):
-        teleop_command = DriveWithJoystickCommand(
-            self.drive_subsystem, self.get_drive_value_from_joystick
-        )
-        self.drive_subsystem.setDefaultCommand(
-            teleop_command
-        )
-        self.shooter_subsystem.setDefaultCommand(
-            ShooterIdleCommand(self.shooter_subsystem)
-        )
-        self.intake_subsystem.setDefaultCommand(
-            IntakeIdleCommand(intake = self.intake_subsystem)
-        )
 
     def get_drive_value_from_joystick(self) -> tuple[float, float, float]:
         """  
@@ -86,7 +62,7 @@ class RobotContainer:
         controller = CommandXboxController(
             OperatorInterfaceConstants.DRIVER_CONTROLLER_PORT
         )
-
+        
         controller.y().onTrue(SlowModeOffCommand(drive = self.drive_subsystem))
         controller.x().onTrue(SlowModeOnCommand(drive = self.drive_subsystem))
 
@@ -96,17 +72,15 @@ class RobotContainer:
 
         return controller
     
-    def _initialize_op_controller(self):
-        """initialize the operator controller"""
+    def _initialize_dr_controller(self):
+        """initialize the driver controller"""
         controller = CommandXboxController(
-            OperatorInterfaceConstants.OPERATOR_CONTROLLER_PORT
-        )
-        controller.rightTrigger().whileTrue(
-            ShootCommand(shoot = self.shooter_subsystem)
-        )
-        controller.leftTrigger().whileTrue(
-            IntakeCommand(intake = self.intake_subsystem)
+            OperatorInterfaceConstants.DRIVER_CONTROLLER_PORT
         )
 
+        controller.a().onTrue(AimAtHubTagCommand(drivetrain = self.drive_subsystem))
 
         return controller
+
+
+

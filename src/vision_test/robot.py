@@ -10,7 +10,6 @@ class Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
 
-
         self.container = robot_container.RobotContainer()
         self.autonomous_command: Optional[commands2.Command] = None
         if Robot.isReal():
@@ -37,15 +36,12 @@ class Robot(wpilib.TimedRobot):
 
 
     def teleopInit(self):
-        if self.autonomous_command is not None:
-            self.autonomous_command.cancel()
 
         CommandScheduler.getInstance().cancelAll()
 
     def disabledInit(self):
         pass
-        # self.autonomous_command = self.container.get_auto_command()
-        # CommandScheduler.getInstance().cancelAll()
+    
 
 
     def testInit(self):

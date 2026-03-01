@@ -7,7 +7,7 @@ from ntcore import NetworkTableInstance
 from wpilib import SmartDashboard
 from wpilib.shuffleboard import Shuffleboard
 from wpimath.geometry import Pose2d, Rotation2d
-from wpimath.units import seconds
+from wpimath.units import seconds, inchesToMeters, degreesToRadians, degrees, metersToInches
 from typing import Optional, Callable, Tuple
 from constants.visionconstant import VisionConstants
 
@@ -30,17 +30,6 @@ class VisionSubsystem(commands2.Subsystem):
     - Call has_valid_target(), get_tx(), get_target_id() from commands
     """
 
-    # def __init__(self, add_vision_measurement_fn: Callable[[Pose2d, float, Tuple[float, float, float]], None]):
-    #     """
-    #     Parameters:
-    #     -----------
-    #     add_vision_measurement_fn : Callable[[Pose2d, float, Tuple[float, float, float]], None]
-    #         Function to call when we have a good pose estimate.
-    #         Usually: drivetrain.odometry.addVisionMeasurement(pose, timestamp, std_devs)
-    #     """
-    #     super().__init__()
-    #     self.add_vision_measurement_fn = add_vision_measurement_fn
-
     def __init__(self, add_vision_measurement_fn: Optional[Callable] = None): #Used for not connected to the drivetrain
 
         super().__init__()
@@ -58,10 +47,6 @@ class VisionSubsystem(commands2.Subsystem):
             self.limelight = None
 
         self.table = NetworkTableInstance.getDefault().getTable("limelight")
-        
-        # Latest data
-        self.last_result: Optional[limelightresults.GeneralResult] = None
-        self.last_timestamp: Optional[float] = None
 
         # Create a dedicated Shuffleboard Tab
         self.vision_tab = Shuffleboard.getTab("Vision System")
@@ -73,74 +58,88 @@ class VisionSubsystem(commands2.Subsystem):
             .withPosition(4, 1) 
             .getEntry()
         )
-    
+        self.target_tx_entry = (
+            self.vision_tab.add("Active Target X", 0.0)
+            .withWidget("Text View")
+            .withPosition(4, 2) 
+            .getEntry()
+        )
+        self.target_ty_entry = (
+            self.vision_tab.add("Active Target Y", 0.0)
+            .withWidget("Text View")
+            .withPosition(5, 2) 
+            .getEntry()
+        )
+
+        self.target_ta_entry = (
+            self.vision_tab.add("Active Target Angle", 0.0)
+            .withWidget("Text View")
+            .withPosition(6, 2) 
+            .getEntry()
+        )
+
         self.trustworthy_entry = (
             self.vision_tab.add("Vision Trustworthy", False)
             .withPosition(5, 1) 
             .getEntry()
         )
 
+        self.vision_x_entry = (
+            self.vision_tab.add("Vision X", 0) #metersToInches(pose.X())
+            .withWidget("Text View")
+            .withPosition(4, 0)
+            .getEntry()
+        )
+        self.vision_y_entry = (
+            self.vision_tab.add("Vision Y", 0) #metersToInches(pose.Y())
+            .withWidget("Text View")
+            .withPosition(5, 0)
+            .getEntry()
+        )
+        self.vision_rotation_entry = (
+            self.vision_tab.add("Robot Rotation", 0) #pose.rotation().degrees()
+            .withWidget("Text View")
+            .withPosition(6, 0)
+            .getEntry()
+        )
+
+        self.vision_status_entry = (
+            self.vision_tab.add("Status", self.debug_status())
+            .withPosition(6,1)
+            .getEntry()
+        )
+
     def periodic(self):
-        # Update our specific Shuffleboard Tab entries
-        current_id = self.get_target_id()
-        self.target_id_entry.setDouble(current_id)   
 
-        if self.limelight is None:
-            return
+        # Just read NetworkTables — very fast
+        self.target_id_entry.setDouble(self.get_target_id())
+
+        self.target_tx_entry.setDouble(self.get_tx())   
+
+        self.target_ty_entry.setDouble(self.get_ty())  
+
+        self.target_ta_entry.setDouble(self.get_ta())
+
+        self.vision_status_entry.setString(self.debug_status())  
+        # etc.
+
+        # Only do botpose / pose estimation when you actually see valid tags
+        if self.has_valid_target():
+            
+            self.trustworthy_entry.setBoolean(self._is_result_trustworthy(self.limelight.get_results()))
+
+            botpose = self.table.getEntry("botpose_wpiblue").getDoubleArray([])
+            if len(botpose) >= 6:
+                pose = Pose2d(botpose[0], botpose[1], Rotation2d.fromDegrees(botpose[5]))
+                timestamp = wpilib.Timer.getFPGATimestamp() - (self.table.getEntry("tl").getDouble(0)/1000.0 + 0.011)  # approx
+                self.vision_x_entry.setDouble(metersToInches(pose.X()))
+                self.vision_y_entry.setDouble(metersToInches(pose.Y()))
+                self.vision_rotation_entry.setDouble(pose.rotation().degrees())
+                if self.add_vision_measurement_fn:
+                    self.add_vision_measurement_fn(pose, timestamp, (0.6,0.6,9999))
+        else:
+            self.trustworthy_entry.setBoolean(False)
         
-        result = self.limelight.get_results()
-
-        # Update Trustworthy status on the tab
-        is_trustworthy = False
-        if result and result.get("v", 0) != 0:
-            is_trustworthy = self._is_result_trustworthy(result)
-        
-        self.trustworthy_entry.setBoolean(is_trustworthy)
-
-        # Get MegaTag2 pose (blue alliance origin)
-        botpose_blue = result.get("botpose_wpiblue")
-
-        if botpose_blue and len(botpose_blue) >= 6:
-            # Create the Pose object using specific list indexes
-            pose = Pose2d(
-                botpose_blue[0],                     # x (meters)
-                botpose_blue[1],                     # y (meters)
-                Rotation2d.fromDegrees(botpose_blue[5])  # yaw (degrees)
-            )
-
-            # # Update SmartDashboard with the raw numbers
-            # SmartDashboard.putNumber("Robot Pose X", pose.X())
-            # SmartDashboard.putNumber("Robot Pose Y", pose.Y())
-            # SmartDashboard.putNumber("Robot Rotation", pose.rotation().degrees())
-
-            # # Feed to odometry (using the converted timestamp from earlier)
-            # timestamp = result.get("ts", 0) / 1000.0
-            # self.add_vision_measurement_fn(
-            #     pose,
-            #     timestamp,
-            #     VisionConstants.POSE_STD_DEV_POSITION
-            # )
-
-            # logger.debug(f"Vision pose update: {pose} @ {timestamp:.3f}s")
-
-            # Always update SmartDashboard (even without a drivetrain)
-            self.vision_tab.add("Vision X", pose.X()).withPosition(4, 0) 
-            self.vision_tab.add("Vision Y", pose.Y()).withPosition(5, 0) 
-            self.vision_tab.add("Robot Rotation", pose.rotation().degrees()).withPosition(6, 0) 
-
-            # ONLY call the drivetrain function if it actually exists
-            timestamp = result.get("ts", 0) / 1000.0
-            if self.add_vision_measurement_fn is not None:
-                self.add_vision_measurement_fn(
-                    pose,
-                    timestamp,
-                    VisionConstants.POSE_STD_DEV_POSITION
-                )
-            else:
-                # Optional: print a reminder once in a while
-                pass 
-
-            logger.debug(f"Vision pose update: {pose} @ {timestamp:.3f}s")
 
     def get_target_id(self) -> float:
         """Returns the current AprilTag ID or -1.0 if none seen."""
@@ -180,57 +179,34 @@ class VisionSubsystem(commands2.Subsystem):
     # ────────────────────────────────────────────────
 
     def has_valid_target(self) -> bool:
-        return (
-            self.last_result is not None
-            and self.last_result.validity > 0
-            and self.last_result.fiducialResults
-        )
+        """
+        True if Limelight currently reports at least one valid target (tv >= 1).
+        This is the most common / reliable check in FRC.
+        """
+        tv = self.table.getEntry("tv").getDouble(0.0)
+        return tv >= 1.0
 
     def get_tx(self) -> float:
         """Horizontal offset to primary target (degrees, left negative)"""
-        if self.has_valid_target():
-            return self.last_result.fiducialResults[0].target_x_degrees
-        return 0.0
+        # if self.has_valid_target():
+        #     return self.last_result.fiducialResults[0].target_x_degrees
+        # return 0.0
+        return self.table.getEntry("tx").getDouble(0.0)
 
     def get_ty(self) -> float:
         """Vertical offset to primary target (degrees, up positive)"""
-        if self.has_valid_target():
-            return self.last_result.fiducialResults[0].target_y_degrees
-        return 0.0
-
-    def get_tag_count(self) -> int:
-        """Number of currently detected AprilTags"""
-        if self.last_result and self.last_result.fiducialResults:
-            return len(self.last_result.fiducialResults)
-        return 0
-
-    def get_botpose_blue(self) -> Optional[Pose2d]:
-        """Returns the Robot's 2D Pose (X, Y, Rotation) relative to the blue alliance origin."""
-        # Get the latest result dict
-        result = self.limelight.get_results()
-        
-        # Check validity (v=1 means it sees tags)
-        if result is None or result.get("v", 0) == 0:
-            return None
-
-        # Get the blue alliance array
-        botpose = result.get("botpose_wpiblue")
-
-        # Convert to WPILib Pose2d [x, y, z, roll, pitch, yaw]
-        if botpose and len(botpose) >= 6:
-            return Pose2d(
-                botpose[0], # X in meters
-                botpose[1], # Y in meters
-                Rotation2d.fromDegrees(botpose[5]) # Yaw in degrees
-            )
-        return None
+        # if self.has_valid_target():
+        #     return self.last_result.fiducialResults[0].target_y_degrees
+        # return 0.0
+        return self.table.getEntry("ty").getDouble(0.0)
+    
+    def get_ta(self) -> float:
+        return self.table.getEntry("ta").getDouble(0.0)
 
     def debug_status(self) -> str:
-        """For SmartDashboard or troubleshooting."""
         if self.limelight is None:
             return "No Limelight detected"
-        if not self.has_valid_target():
+        elif not self.has_valid_target():
             return "No valid target"
-        tag_id = self.get_target_id()
-        tx, ty = self.get_tx(), self.get_ty()
-        return f"Tag {tag_id} | tx={tx:.1f}° ty={ty:.1f}° | {self.get_tag_count()} tags"
+        else:
+            return "Valid target"

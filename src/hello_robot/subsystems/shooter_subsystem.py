@@ -4,7 +4,7 @@ import commands2
 
 from wpilib import SmartDashboard
 from constants.shooterconstant import ShooterConstants
-from constants.new_types import inches_per_second, degrees_per_second, percentage
+from constants.newtypes import inches_per_second, degrees_per_second, percentage
 
 
 class ShooterSubsystem(commands2.Subsystem):
@@ -32,10 +32,13 @@ class ShooterSubsystem(commands2.Subsystem):
             return False
     
     def kick(self) -> None:
-        self.kicker_motor.set(0.1)
+        self.kicker_motor.set(0.5)
     
     def stop_kicking(self) -> None:
         self.kicker_motor.stopMotor()
+ 
+    def kick_cough(self) -> None:
+        self.kicker_motor.set(-0.1)
 
     def periodic(self):
         SmartDashboard.putNumber("Shooter Velocity", self.get_shooter_velocity())

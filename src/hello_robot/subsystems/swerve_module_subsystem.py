@@ -17,7 +17,7 @@ from wpimath.units import (
 import wpilib 
 
 from constants.driveconstants import DriveConstants
-from constants.new_types import percentage, inches_per_second
+from constants.newtypes import percentage, inches_per_second
 
 
 def _calc_drive_effort(speed: inches_per_second) -> percentage:

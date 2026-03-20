@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from wpimath.units import metersToInches
 
-from constants.new_types import (
+from constants.newtypes import (
     inches_per_second,
     inches,
     degrees_per_second,
@@ -20,13 +20,13 @@ class DriveConstants:
     CAN_FL = 8
     CAN_BL = 5
     CAN_BR = 2
-    # Gears to the LEFT fo the Robot
+    # Gears to the LEFT of the Robot
     # CANcoder (magnet) offsets in rotations that we got from the CANcoder using Phoenix Tuner X 
     # Not really needed
-    BR_OFFSET = -0.253906  # -0.242
-    BL_OFFSET = -0.319580 # -0.175
-    FR_OFFSET = 0.464844 # 0.033
-    FL_OFFSET = -0.414307  # -0.081
+    BR_OFFSET = -0.253906   # -0.279297
+    BL_OFFSET = -0.330811  # -0.319580
+    FR_OFFSET = 0.487305  # -0.110595
+    FL_OFFSET = -0.412598   # -1.362061
 
     # Kraken IDs
     DRIVE_FR = 12

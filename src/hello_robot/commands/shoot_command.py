@@ -14,14 +14,19 @@ class ShootCommand(commands2.Command):
         self.shoot = shoot
         self.addRequirements(shoot)
 
+    def initialize(self):
+        print("Shooting")
+
     def execute(self):
         
-        self.shoot.shooter_action(-0.6)
+        self.shoot.shooter_action(-0.65)
         self.shoot.check_shooter_velocity()
         if self.shoot.check_shooter_velocity() == True:
             self.shoot.kick()
-        elif self.shoot.check_shooter_velocity() == False:
+        else:
             self.shoot.stop_kicking()
+
+        # elif self.shoot.check_shooter_velocity() == False:
 
     """
     Makes sure code is finished

@@ -3,14 +3,18 @@ from commands2.button import CommandXboxController
 from wpimath import applyDeadband
 from wpimath.geometry import Pose2d
 
+from commands.autonomous_commands import Autos
 from wpilib import SmartDashboard, SendableChooser
 
-
+from constants.autoconsts import AutoConsts
 from constants.operatorinterfaceconstants import OperatorInterfaceConstants
+
 
 from subsystems.drive_subsystem import DriveSubsystem # doublecheck 
 from subsystems.shooter_subsystem import ShooterSubsystem
 from subsystems.intake_subsystem import IntakeSubsystem
+
+from subsystems.climb_subsystem import ClimbSubsystem
 
 
 from commands.drive_with_joystick_command import DriveWithJoystickCommand
@@ -21,6 +25,12 @@ from commands.slow_mode_off_command import SlowModeOffCommand #doublecheck
 from commands.slow_mode_on_command import SlowModeOnCommand # doublecheck
 from commands.intake_command import IntakeCommand
 from commands.intake_idle_command import IntakeIdleCommand
+from commands.cough_command import CoughCommand
+from commands.choking_command import ChokingCommand
+
+from commands.climb_down_command import ClimbDownCommand
+from commands.climb_up_command import ClimbUpCommand
+from commands.climb_idle_command import ClimbIdleCommand
 
 
 
@@ -31,11 +41,16 @@ class RobotContainer:
         self.drive_subsystem = DriveSubsystem()
         self.shooter_subsystem = ShooterSubsystem()
         self.intake_subsystem = IntakeSubsystem()
+        self.climb_subsystem = ClimbSubsystem()
 
         self.dr_controller = self._initialize_dr_controller()
         self.op_controller = self._initialize_op_controller()
 
         self._initialize_default_commands()
+
+        self.auto_chooser = self._initialize_shuffleboard()
+        # Add chooser to SmartDashboard
+        SmartDashboard.putData("Auto Command Selector", self.auto_chooser)
 
 
     def _initialize_default_commands(self):
@@ -50,6 +65,9 @@ class RobotContainer:
         )
         self.intake_subsystem.setDefaultCommand(
             IntakeIdleCommand(intake = self.intake_subsystem)
+        )
+        self.climb_subsystem.setDefaultCommand(
+            ClimbIdleCommand(climb = self.climb_subsystem)
         )
 
     def get_drive_value_from_joystick(self) -> tuple[float, float, float]:
@@ -107,6 +125,42 @@ class RobotContainer:
         controller.leftTrigger().whileTrue(
             IntakeCommand(intake = self.intake_subsystem)
         )
+        controller.rightBumper().onTrue(
+            CoughCommand(shoot = self.shooter_subsystem)
+        )
+        controller.leftBumper().whileTrue(
+            ChokingCommand(intake = self.intake_subsystem)
+        )
+        controller.leftStick().whileTrue( 
+            ClimbUpCommand(climb = self.climb_subsystem)
+        )
+        controller.rightStick().whileTrue(
+            ClimbDownCommand(climb = self.climb_subsystem)
+        )
+        
+
+        
 
 
         return controller
+    
+    @staticmethod
+    def _initialize_shuffleboard():
+        # Auto chooser
+        auto_chooser = SendableChooser()
+        auto_chooser.setDefaultOption("Backwards", AutoConsts.BACKWARD)
+        
+        # Add options
+        auto_chooser.addOption("Shoot", AutoConsts.SHOOT)
+        return auto_chooser
+
+    def get_auto_command(self) -> commands2.Command:
+        auto_reader = self.auto_chooser.getSelected()
+
+        if (
+            auto_reader == AutoConsts.BACKWARD
+        ):  # checks which Autonomous command is being used
+            return Autos.backward(self.drive_subsystem, self.shooter_subsystem)
+        elif auto_reader == AutoConsts.SHOOT:
+            return Autos.shoot(self.shooter_subsystem, self.intake_subsystem)
+       

@@ -8,5 +8,6 @@ class ShooterConstants:
     KICKER_ID = 15
 
     #-3960
-    SHOOTER_VELOCITY_MAX = -3950
-    SHOOTER_VELOCITY_MIN = -3970
+    SHOOTER_VELOCITY_MAX = -430
+    0
+    SHOOTER_VELOCITY_MIN = -4350

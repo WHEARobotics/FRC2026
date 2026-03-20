@@ -12,7 +12,7 @@ class IntakeCommand(commands2.Command):
         self.addRequirements(intake)
 
     def execute(self):
-        self.intake.intake_action(0.5)
+        self.intake.intake_action(-0.3)
 
     def isFinished(self) -> bool:
         return False

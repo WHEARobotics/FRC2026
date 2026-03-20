@@ -6,11 +6,11 @@ from subsystems.drive_subsystem import DriveSubsystem
 
 
 class DriveToGoal (Command):
-    def __init__(self, drive_subsystem: DriveSubsystem, goal_pose: Pose2d):
+    def __init__(self, drive: DriveSubsystem, goal_pose: Pose2d):
         super().__init__()
-        self.drive_subsystem = drive_subsystem
+        self.drive_subsystem = drive
         self.goal_pose = goal_pose
-        self.addRequirement(drive_subsystem)
+        self.addRequirements(drive)
 
 
     def initialize(self):
@@ -18,10 +18,11 @@ class DriveToGoal (Command):
 
 
     def execute(self):
-        self.drive_subsystem.drive_to_goal
+        self.drive_subsystem.drive_to_goal()
 
-    def isFinished(self):
+    def isFinished(self) -> bool:
         return self.drive_subsystem.is_at_goal()
     
     def end(self, interrupted: bool):
         self.drive_subsystem.stop()
+        print("At goal")

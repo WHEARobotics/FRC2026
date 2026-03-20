@@ -8,15 +8,6 @@ import robot_container
 
 
 
-
-
-
-
-
-
-
-
-
 class Robot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
@@ -38,19 +29,13 @@ class Robot(wpilib.TimedRobot):
 
 
     def autonomousInit(self):
-        self.autonomous_command = self.container.get_auto_command
+        self.autonomous_command = self.container.get_auto_command()
         if self.autonomous_command is not None:
-            self.
-
+            self.autonomous_command.schedule()
     
 
     def disabledPeriodic(self):
         pass
-
-
-
-
-
 
     def teleopInit(self):
         if self.autonomous_command is not None:
@@ -59,10 +44,10 @@ class Robot(wpilib.TimedRobot):
         CommandScheduler.getInstance().cancelAll()
 
     def disabledInit(self):
-        pass
-        # self.autonomous_command = self.container.get_auto_command()
-        # CommandScheduler.getInstance().cancelAll()
+
+        self.autonomous_command = self.container.get_auto_command()
+        CommandScheduler.getInstance().cancelAll()
 
 
     def testInit(self):
-        CommandScheduler.getInstance().cancelAll
+        CommandScheduler.getInstance().cancelAll()

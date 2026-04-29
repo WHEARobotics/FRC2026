@@ -85,8 +85,8 @@ class DriveSubsystem(commands2.Subsystem):
         self.pose_estimator = self._initialize_pose_estimator()
 
         self.slow_mode = False
-        self.speed_divisor = 2
-        self.rotation_divisor = 4
+        self.speed_divisor = 1
+        self.rotation_divisor = 1
 
         self.field_sim = Field2d()
         SmartDashboard.putData("Field", self.field_sim)

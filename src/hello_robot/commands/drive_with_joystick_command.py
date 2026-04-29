@@ -30,9 +30,9 @@ class DriveWithJoystickCommand(
         rot_speed = rot_speed * DriveConstants.MAX_DEGREES_PER_SECOND * -1 / rotation_divisor
 
         self.drive_subsystem.drive(
-            x_speed_inches_per_second=y_speed,
-            y_speed_inches_per_second=x_speed,
-            rot_speed_degrees_per_second=rot_speed,
+            x_speed=y_speed,
+            y_speed=x_speed,
+            rot_speed=rot_speed,
         )  # Give these values to drive function
 
     def isFinished(self):

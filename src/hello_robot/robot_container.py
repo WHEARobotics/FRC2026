@@ -8,12 +8,11 @@ from wpilib import SmartDashboard, SendableChooser
 
 from constants.autoconsts import AutoConsts
 from constants.operatorinterfaceconstants import OperatorInterfaceConstants
-
+from constants.climbconstants import ClimbConstants
 
 from subsystems.drive_subsystem import DriveSubsystem # doublecheck 
 from subsystems.shooter_subsystem import ShooterSubsystem
 from subsystems.intake_subsystem import IntakeSubsystem
-
 from subsystems.climb_subsystem import ClimbSubsystem
 
 
@@ -27,8 +26,8 @@ from commands.intake_command import IntakeCommand
 from commands.intake_idle_command import IntakeIdleCommand
 from commands.cough_command import CoughCommand
 from commands.choking_command import ChokingCommand
-
 from commands.climb_down_command import ClimbDownCommand
+from commands.climb_command import ClimbToGoalCommand
 from commands.climb_up_command import ClimbUpCommand
 from commands.climb_idle_command import ClimbIdleCommand
 
@@ -131,8 +130,8 @@ class RobotContainer:
         controller.leftBumper().whileTrue(
             ChokingCommand(intake = self.intake_subsystem)
         )
-        controller.leftStick().whileTrue( 
-            ClimbUpCommand(climb = self.climb_subsystem)
+        controller.leftStick().onTrue( 
+            ClimbToGoalCommand(goal = ClimbConstants.TOP_HEIGHT, climb = self.climb_subsystem)
         )
         controller.rightStick().whileTrue(
             ClimbDownCommand(climb = self.climb_subsystem)
@@ -160,7 +159,7 @@ class RobotContainer:
         if (
             auto_reader == AutoConsts.BACKWARD
         ):  # checks which Autonomous command is being used
-            return Autos.backward(self.drive_subsystem, self.shooter_subsystem)
+            return Autos.backward(self.drive_subsystem, self.shooter_subsystem, self.intake_subsystem)
         elif auto_reader == AutoConsts.SHOOT:
             return Autos.shoot(self.shooter_subsystem, self.intake_subsystem)
        

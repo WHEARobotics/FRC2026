@@ -9,6 +9,9 @@ class ClimbIdleCommand(commands2.Command):
         self.climb = climb
         self.addRequirements(climb)
 
+    def initialize(self):
+        self.climb.initialized_and_stop()
+
     def execute(self):
         self.climb.stop()
 

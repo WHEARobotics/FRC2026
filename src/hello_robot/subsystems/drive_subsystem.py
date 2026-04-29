@@ -54,7 +54,7 @@ class DriveSubsystem(commands2.Subsystem):
         # Shuffleboard Tab
         self.robot_tab = Shuffleboard.getTab("Robot System")
 
-        self.slow_mode_entry = self.robot_tab.add("Slow mode", self.slow_mode).withPosition(7, 1).getEntry()
+        self.slow_mode_entry = self.robot_tab.add("Slow mode", False).withPosition(7, 1).getEntry()
 
         self.target_id_entry = self.robot_tab.add("Active Target ID", -1.0).withPosition(4, 1).getEntry()
         self.target_tx_entry = self.robot_tab.add("Active Target X", 0.0).withPosition(4, 2).getEntry()
@@ -120,8 +120,8 @@ class DriveSubsystem(commands2.Subsystem):
 
         self.slow_mode = False
 
-        self.speed_divisor = 2
-        self.rotation_divisor = 4
+        self.speed_divisor = 1
+        self.rotation_divisor = 1
 
 
         self.field_sim = Field2d()
@@ -182,8 +182,9 @@ class DriveSubsystem(commands2.Subsystem):
 
         self.slow_mode_entry.setBoolean(self.slow_mode)
 
-        positions = [module.get_position() for module in self.modules]
-        self.pose_estimator.update(self.get_gyro_heading_rotation2d(), *positions)
+        position = tuple([module.get_position() for module in self.modules])
+
+        self.pose_estimator.update(self.get_gyro_heading_rotation2d(), position)
 
         self.pose = self.pose_estimator.getEstimatedPosition()
 
@@ -478,7 +479,7 @@ class DriveSubsystem(commands2.Subsystem):
         )
 
         # Send the values to the drive train.
-        self.drive(x_speed_inches_per_second=clamped_x, y_speed_inches_per_second=clamped_y, rot_speed_degrees_per_second=clamped_rot)
+        self.drive(x_speed=clamped_x, y_speed=clamped_y, rot_speed=clamped_rot)
 
     def is_at_goal(self):
         """
@@ -552,10 +553,10 @@ class DriveSubsystem(commands2.Subsystem):
 
     def check_and_set_slow_mode(self):
         if self.slow_mode == True:
-            self.speed_divisor = 8
-            self.rotation_divisor = 16
+            self.speed_divisor = 4
+            self.rotation_divisor = 8
         else:
-            self.speed_divisor = 2
+            self.speed_divisor = 1
             self.rotation_divisor = 4
 
         return self.speed_divisor, self.rotation_divisor

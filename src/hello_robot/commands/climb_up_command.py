@@ -10,7 +10,7 @@ class ClimbUpCommand(commands2.Command):
         self.addRequirements(climb)
 
     def execute(self):
-        self.climb.climb(-0.2)
+        self.climb.climb(0.2)
 
 
     def isFinished(self) -> bool:

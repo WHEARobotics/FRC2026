@@ -82,7 +82,7 @@ class DriveConstants:
         78.0 * 1.5
     )
     HORIZ_POS_TOL: inches = (
-        4.0
+        5.0
     )
     HORIZ_VEL_TOL: inches_per_second = 0.4
 
